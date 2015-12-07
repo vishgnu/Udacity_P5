@@ -1,0 +1,13 @@
+﻿
+#map {
+  display: block;
+  height: 100%;
+  margin: 0 5%;
+}
+
+#map-div {
+  height: 400px;
+  width: 100%;
+  padding-bottom: 5%;
+}
+
