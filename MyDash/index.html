@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Bootstrap 101 Template</title>
+    <title>Udacity P5</title>
 
     <!-- Bootstrap -->
     <link href="Content/bootstrap.min.css" rel="stylesheet">
@@ -41,22 +41,10 @@
     </div>
     <div class="row">
         <div class="col-md-2">
-            <div class="list-group">
-                <a href="#" class="list-group-item active">
-                    <h4 class="list-group-item-heading">Restauran 1</h4>
-                    <p class="list-group-item-text">Thaistyle</p>
-                </a>
+            <div class="list-group" data-bind="foreach: Restaurants">
                 <a href="#" class="list-group-item">
-                    <h4 class="list-group-item-heading">Restaurant 2</h4>
-                    <p class="list-group-item-text">Greek</p>
-                </a>
-                <a href="#" class="list-group-item">
-                    <h4 class="list-group-item-heading">Restaurant 3</h4>
-                    <p class="list-group-item-text">Burgerking</p>
-                </a>
-                <a href="#" class="list-group-item">
-                    <h4 class="list-group-item-heading">Restaurant 4</h4>
-                    <p class="list-group-item-text">Italian</p>
+                    <h4 class="list-group-item-heading" data-bind="text: name "></h4>
+                    <p class="list-group-item-text" data-bind="text: typeOfKitchen().type"></p>
                 </a>
             </div>
         </div>
