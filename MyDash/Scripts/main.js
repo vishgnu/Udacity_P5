@@ -1,43 +1,64 @@
-﻿// Class to represent a row in the seat reservations grid
-function Restaurant(name, kitchenType) {
-    var self = this;
-    self.name = name;
-    self.typeOfKitchen = ko.observable(kitchenType);
-}
+﻿(function () {
+    'use strict';
+
+    // Class to represent a single restaurant
+    var Restaurant = function (name, kitchenType) {
+        var self = this;
+        self.name = name;
+        self.typeOfKitchen = ko.observable(kitchenType)
+    }
+
+    // main viewmodel for this screen, along with initial state
+    var ViewModel = function(restaurants) {
+
+        // keep track of self
+        var self = this;
+
+        this.restaurants = ko.observableArray(restaurants);
+        //this.restaurants = ko.observableArrary(restaurants.map(function (restaurant) {
+        //    var testres = restaurant;
+
+        //    return new Restaurant(restaurant.name, restaurant.typeOfKitchen)
+        //}));
 
 
-// Overall viewmodel for this screen, along with initial state
-function RestaurantFinderViewModel() {
-    var self = this;
+    }
 
-    // Non-editable catalog data - would come from the server
-    self.kitchenTypes = [
-        { type: "Italian Restaurant"},
-        { type: "Thai Streetkitchen"},
+    // some masterdata
+    var kitchenTypes = [
+        { type: "Italian Restaurant" },
+        { type: "Thai Streetkitchen" },
         { type: "Burger Joint" },
-        { type: "Greekt Grill" }
+        { type: "Greek Grill" },
+        { type: "Chinese Restaurant" },
+        { type: "German Restaurant" },
+        { type: "Bar/Restaurant" }
     ];
 
     // Searchable data
-    self.Restaurants = ko.observableArray([
-        new Restaurant("The Stallion", self.kitchenTypes[0]),
-        new Restaurant("Thai Ngam", self.kitchenTypes[1]),
-        new Restaurant("Walt's Diner", self.kitchenTypes[2]),
-        new Restaurant("Apollon Grill", self.kitchenTypes[3])
-    ]);
-}
+    var restaurants = [
+        new Restaurant("The Stallion", kitchenTypes[0]),
+        new Restaurant("Thai Ngam", kitchenTypes[1]),
+        new Restaurant("Walt's Diner", kitchenTypes[2]),
+        new Restaurant("Apollon Grill", kitchenTypes[3]),
+        new Restaurant("China Restaurant Wang Fu", kitchenTypes[4]),
+        new Restaurant("Restaurant il Mulino Ercole Ruggiero", kitchenTypes[0]),
+        new Restaurant("Moerser Brauhaus", kitchenTypes[5]),
+        new Restaurant("Gasthof Hufen", kitchenTypes[5]),
+        new Restaurant("Cafe Del Sol", kitchenTypes[6]),
+        new Restaurant("Chili's Bar & Restaurant", kitchenTypes[4]),
+        new Restaurant("Bua Luang", kitchenTypes[1])
+    ];
 
-// run knockout
-ko.applyBindings(new RestaurantFinderViewModel());
 
 
-var map = {
-    "display": function displayMap() {
+// bind a new instance of our view model to the page
+var viewModel = new ViewModel(restaurants || []);
 
-        $("#map-div").append(googleMap);
-    }
+ko.applyBindings(viewModel);
 
-}
+    showMarkers();
 
-// here drwarfs shovelling html
-map.display();
+}());
+
+
