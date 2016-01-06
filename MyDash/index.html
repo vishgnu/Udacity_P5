@@ -46,6 +46,8 @@
                 <a href="#" class="list-group-item">
                     <h4 class="list-group-item-heading" data-bind="text: name "></h4>
                     <p class="list-group-item-text" data-bind="text: typeOfKitchen().type"></p>
+                    <div data-bind="text: showMarker"> </div>
+                   
                 </a>
             </div>
         </div>
@@ -53,8 +55,11 @@
 
             <div style="height:100%; margin: 0; padding: 0;">
                 <div id="map-div">
+
+                    <span data-bind="marker: {restaurant: $data}"></span>
+                
                 </div>
-            </div>
+                
 
         </div>
     </div>
