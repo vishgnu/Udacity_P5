@@ -41,8 +41,8 @@ var stringContains = function (string, contains) {
 
 //    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
 
-//        //var map = document.getElementById("map-div");
-//        var map = bindingContext.$root.getMap();
+//        var mapDiv = document.getElementById("map-div");
+//        var map = "";//bindingContext.$root.getMap();
 //        var restaurant = valueAccessor().restaurant;
 //        var latLng = new google.maps.LatLng(restaurant.lat, restaurant.long);
 //        var marker = new google.maps.Marker({
@@ -85,8 +85,7 @@ var GoogleMap = function (center, element) {
     var self = this;
 
         var mapOptions = {
-            disableDefaultUI: true,
-            
+            center: center,
             zoom: 13
         };
 
@@ -196,6 +195,7 @@ var viewModel = new ViewModel(restaurants || []);
 
 // run ko bindings
 ko.applyBindings(viewModel);
+
 
 }());
 
