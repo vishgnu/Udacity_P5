@@ -1,6 +1,4 @@
-﻿var map;    // declares a global map variable
-
-
+﻿
 // helper
 var stringContains = function (string, contains) {
     string = string || "";
@@ -37,46 +35,66 @@ var stringContains = function (string, contains) {
 
 //}
 
-ko.bindingHandlers.marker = {
+//ko.bindingHandlers.marker = {
 
-    infowindow: null,
+//    infowindow: null,
 
-    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+//    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
 
-        var map = bindingContext.$parent.mapControl;
-        var restaurant = valueAccessor().restaurant;
-        var latLng = new google.maps.LatLng(restaurant.lat, restaurant.long);
-        var marker = new google.maps.Marker({
-            position: latLng,
-            map: map,
-            icon: "http://chart.apis.google.com/chart?chst=d_bubble_icon_text_small_withshadow&chld=swim|bbT|" + restaurant.name + "|24527A|E0EBEB",
-            title: restaurant.name
-        });
+//        //var map = document.getElementById("map-div");
+//        var map = bindingContext.$root.getMap();
+//        var restaurant = valueAccessor().restaurant;
+//        var latLng = new google.maps.LatLng(restaurant.lat, restaurant.long);
+//        var marker = new google.maps.Marker({
+//            position: latLng,
+//            map: map,
+//            icon: "http://chart.apis.google.com/chart?chst=d_bubble_icon_text_small_withshadow&chld=swim|bbT|" + restaurant.name + "|24527A|E0EBEB",
+//            title: restaurant.name
+//        });
 
-        marker.addListener('click', function () {
-            ko.bindingHandlers.marker.openInfoWindow(map, marker);
-        });
-    },
+//        marker.addListener('click', function () {
+//            ko.bindingHandlers.marker.openInfoWindow(map, marker);
+//        });
+//    },
 
 
 
-    openInfoWindow: function (map, marker) {
-        var contentString = '<div">' + marker.getTitle() + '</div>';
-        if (this.infowindow) {
-            this.infowindow.close();
+//    openInfoWindow: function (map, marker) {
+//        var contentString = '<div">' + marker.getTitle() + '</div>';
+//        if (this.infowindow) {
+//            this.infowindow.close();
+//        };
+//        this.infowindow = new google.maps.InfoWindow({
+//            content: contentString,
+//            pixelOffset: new google.maps.Size(50, 0),
+//        });
+//        map.setZoom(9);
+//        map.setCenter(marker.getPosition());
+//        this.infowindow.open(map, marker);
+//        google.maps.event.addListener(this.infowindow, 'closeclick', function () {
+//            map.setZoom(7);
+//            //map.setCenter(mapOptions.center);
+//        });
+//    }
+//};
+
+
+
+/* Represents a Google Map object */
+var GoogleMap = function (center, element) {
+    var self = this;
+
+        var mapOptions = {
+            disableDefaultUI: true,
+            
+            zoom: 13
         };
-        this.infowindow = new google.maps.InfoWindow({
-            content: contentString,
-            pixelOffset: new google.maps.Size(50, 0),
-        });
-        map.setZoom(9);
-        map.setCenter(marker.getPosition());
-        this.infowindow.open(map, marker);
-        google.maps.event.addListener(this.infowindow, 'closeclick', function () {
-            map.setZoom(7);
-            //map.setCenter(mapOptions.center);
-        });
-    }
+
+    // assign a google maps element
+    map = new google.maps.Map(element, mapOptions);
+
+   
+    return map;
 };
 
 
@@ -99,6 +117,18 @@ ko.bindingHandlers.marker = {
 
         // keep track of self
         var self = this;
+
+        // initialize defaults
+        var map,
+            mapCanvas = $('#map-div')[0],
+            // center moers
+            center = new google.maps.LatLng(51.4502796, 6.6406621);
+
+
+        function initialize() {
+            map = GoogleMap(center, mapCanvas);
+            //fetchMeetups(meetupApiUrl);
+        }
 
         // our data
         this.allRestaurants = ko.observableArray(restaurants);
@@ -130,6 +160,9 @@ ko.bindingHandlers.marker = {
             self.currentSearchFilter('');
             return;
         };
+
+        // initialization listener
+        google.maps.event.addDomListener(window, 'load', initialize);
     }
 
     // some masterdata
@@ -161,42 +194,8 @@ ko.bindingHandlers.marker = {
 // bind a new instance of our view model to the page
 var viewModel = new ViewModel(restaurants || []);
 
+// run ko bindings
 ko.applyBindings(viewModel);
-
-
-/*
-Start here! initializeMap() is called when page is loaded.
-*/
-function initializeMap() {
-
-    var locations;
-
-    var mapOptions = {
-        disableDefaultUI: true,
-        center: {lat: 51.4502796, lng: 6.6406621},
-        zoom: 13
-    };
-
-    var mapdiv = document.getElementById("map-div");
-    map = new google.maps.Map(mapdiv, mapOptions);
-
-    // Sets the boundaries of the map based on pin locations
-    window.mapBounds = new google.maps.LatLngBounds();
-}
-
-
-// Calls the initializeMap() function when the page loads
-window.addEventListener('load', initializeMap);
-
-// Vanilla JS way to listen for resizing of the window
-// and adjust map bounds
-window.addEventListener('resize', function (e) {
-    //Make sure the map bounds get updated on page resize
-    map.fitBounds(mapBounds);
-});
-
-
-
 
 }());
 

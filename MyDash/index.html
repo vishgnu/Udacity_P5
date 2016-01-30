@@ -31,11 +31,11 @@
                 <label class="col-md-3 control-label" for="formGroupInputLarge">Me hungry!</label>
 
                 <div class="col-md-7">
-                    <input class="form-control" type="text" id="formGroupInputLarge" placeholder="...me likes..." data-bind='value: currentSearchFilter'>
+                    <input class="form-control" type="text" id="formGroupInputLarge" placeholder="...type your food favorite to search..." data-bind="value: currentSearchFilter , valueUpdate: 'keyup'">
                 </div>
                 <div class="col-md-2">
 
-                    <button type="button" class="btn btn-primary glyphicon glyphicon-search" data-bind="click:clearSearch"> Naaa want sth. else</button>
+                    <button type="button" class="btn btn-primary glyphicon glyphicon-cutlery" data-bind="click:clearSearch"> Reset</button>
                 </div>
             </div>
         </div>
@@ -55,12 +55,9 @@
 
             <div style="height:100%; margin: 0; padding: 0;">
                 <div id="map-div">
-
-                    <span data-bind="marker: {restaurant: $data}"></span>
-                
+                    <!--<span data-bind="marker: {restaurant: $data}"></span>-->
                 </div>
-                
-
+            </div>
         </div>
     </div>
 
@@ -71,8 +68,8 @@
     <!-- Knockout-->
     <script src="Scripts/knockout-3.4.0.js"></script>
 
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1PGxZvLmfSm8lZvmcetnAWTy_AByM5Lk&callback=initializeMap"></script>
-
+    <!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1PGxZvLmfSm8lZvmcetnAWTy_AByM5Lk&callback=initializeMap"></script>-->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqSRS4xSeFPLEeNoSThlN0pqXpswxK740"></script>
     <!-- get the app-->
     <script src="Scripts/main.js"></script>
 
