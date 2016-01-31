@@ -3,6 +3,9 @@
     //global for map
     var map;
 
+    // current instance of infowindow
+    var infowindow;
+
     // helper
     var stringContains = function (string, contains) {
         string = string || "";
@@ -64,6 +67,8 @@
 
 
     ko.bindingHandlers.map = {
+
+
         init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
 
             var gm = allBindingsAccessor().map;
@@ -79,6 +84,11 @@
                     position: new google.maps.LatLng(res.lat+i*1,res.long+i*1),
                     title: res.name
                 });
+
+                marker.addListener('click', function () {
+                    openInfoWindow(gm, marker);
+                });
+
 
                 res.mapMarker = marker;
                 res.showMarker = true;
@@ -97,11 +107,32 @@
             var visRes = viewModel.restaurants();
 
             //viewModel.allRestaurants()[0].mapMarker.setVisble(false);
-            
+          
+          
         }
     };
 
 
+    function openInfoWindow (map, marker) {
+    var contentString = '<div">' + marker.getTitle() + '</div>';
+    if (this.infowindow) {
+        this.infowindow.close();
+    };
+
+    this.infowindow = new google.maps.InfoWindow({
+        content: contentString,
+        pixelOffset: new google.maps.Size(50, 0),
+    });
+
+    map.setZoom(9);
+    map.setCenter(marker.getPosition());
+    this.infowindow.open(map, marker);
+
+    //google.maps.event.addListener(this.infowindow, 'closeclick', function () {
+    //    map.setZoom(7);
+    //    //map.setCenter(mapOptions.center);
+    //}
+}
 
     function createMap() {
 
