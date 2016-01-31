@@ -17,9 +17,9 @@
         var self = this;
         self.name = name;
         self.typeOfKitchen = ko.observable(kitchenType)
-        self.showMarker = true;
-        self.lat = 0;
-        self.long = 0;
+        self.showMarker = false;
+        self.lat = 51.4572253;
+        self.long = 6.4787701;
         self.mapMarker = null;
     }
 
@@ -68,31 +68,47 @@
 
             var gm = allBindingsAccessor().map;
 
+
+            for (var i = 0; i < viewModel.allRestaurants().length; i++) {
+                
+                var res = viewModel.allRestaurants()[i];
+
+
+                var marker = new google.maps.Marker({
+                    map: gm,
+                    position: new google.maps.LatLng(res.lat+i*1,res.long+i*1),
+                    title: res.name
+                });
+
+                res.mapMarker = marker;
+                res.showMarker = true;
+            }
+
             //var position = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
 
-            //var marker = new google.maps.Marker({
-            //    map: allBindingsAccessor().map,
-            //    position: position,
-            //    title: name
-            //});
 
             //viewModel._mapMarker = marker;
         },
-        //update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
-        //    var latlng = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
-        //    viewModel._mapMarker.setPosition(latlng);
 
-        //}
+        update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+
+
+            var allRes = viewModel.allRestaurants();
+            var visRes = viewModel.restaurants();
+
+            //viewModel.allRestaurants()[0].mapMarker.setVisble(false);
+            
+        }
     };
 
 
 
     function createMap() {
+
         var elevator;
         var myOptions = {
-            zoom: 3,
-            center: new google.maps.LatLng(12.24, 24.54),
-            mapTypeId: 'terrain'
+            zoom: 15,
+            center: new google.maps.LatLng(51.4572253, 6.4787701),
         };
         map = new google.maps.Map($('#map-div')[0], myOptions);
     }
