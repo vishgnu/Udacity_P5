@@ -82,10 +82,45 @@
                     title: res.name
                 });
 
-                marker.addListener('click', function () {
-                    openInfoWindow(gm, marker);
-                });
+                //marker.addListener('click', function () {
+                //    openInfoWindow(gm, marker);
+                //});
                 
+                google.maps.event.addListener(marker, 'click', (function (marker,map, i) {
+                    return function () {
+                        var infowindow = new google.maps.InfoWindow({
+                            //content: contentString,
+                            pixelOffset: new google.maps.Size(50, 0),
+                        });
+
+                        map.setZoom(9);
+                        map.setCenter(marker.getPosition());
+
+                        infowindow.open(map, marker);
+                        
+                        google.maps.event.addListener(infowindow, 'closeclick', function () {
+                            map.setZoom(3);
+                            map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
+                        });
+
+                        $.ajax({
+                            url: 'getweather',
+                            type: 'POST',
+                            data: { location: i, name: marker.title },
+                            contentType: 'application/json; charset=utf-8',
+                            success: function (response) {
+
+                                var content = "<h1>" + viewModel.allVacations()[i].name + "</h1><br><hr> <h2> Type : " + viewModel.allVacations()[i].typeOfLocation().type + " </h2><br>";
+
+                                infowindow.content(content)
+                            },
+                            error: function () {
+                                infowindow.setContent("<h3>No weather avaliable - sorry</h3>")
+                            }
+                        });
+                    }
+                })(marker,map, i));
+
 
 
                 res.mapMarker = marker;
