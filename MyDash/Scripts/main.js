@@ -16,37 +16,37 @@
     };
 
     // Class to represent a single restaurant
-    var Restaurant = function (name, kitchenType) {
+    var Vacation = function (name, locationType, lat, long) {
         var self = this;
         self.name = name;
-        self.typeOfKitchen = ko.observable(kitchenType)
+        self.typeOfLocation = ko.observable(locationType)
         self.showMarker = false;
-        self.lat = 51.4572253;
-        self.long = 6.4787701;
+        self.lat = lat;
+        self.long = long;
         self.mapMarker = null;
     }
 
     // main viewmodel for this screen, along with initial state
-    var ViewModel = function(restaurants) {
+    var ViewModel = function(vacations) {
 
         // keep track of self
         var self = this;
 
         // our data
-        this.allRestaurants = ko.observableArray(restaurants);
+        this.allVacations = ko.observableArray(vacations);
        
         // store data from input for filtering list of restaurants
         self.currentSearchFilter = ko.observable();
 
-        self.restaurants = ko.computed(function () {
+        self.vacations = ko.computed(function () {
             if (!self.currentSearchFilter()) {
-                return self.allRestaurants();
+                return self.allVacations();
             } else {
 
-                return ko.utils.arrayFilter(self.allRestaurants(), function (rest) {
+                return ko.utils.arrayFilter(self.allVacations(), function (rest) {
                     // get contains for type and restaurantname
                     var indexName = stringContains(rest.name.toLowerCase(), self.currentSearchFilter().toLowerCase());
-                    var indexType = stringContains(rest.typeOfKitchen().type.toLowerCase(), self.currentSearchFilter().toLowerCase());
+                    var indexType = stringContains(rest.typeOfLocation().type.toLowerCase(), self.currentSearchFilter().toLowerCase());
                     if (indexName != -1 || indexType != -1) {
                         return true;
                     }
@@ -64,47 +64,40 @@
         };
     }
 
-
-
     ko.bindingHandlers.map = {
-
 
         init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
 
             var gm = allBindingsAccessor().map;
 
 
-            for (var i = 0; i < viewModel.allRestaurants().length; i++) {
+            for (var i = 0; i < viewModel.allVacations().length; i++) {
                 
-                var res = viewModel.allRestaurants()[i];
+                var res = viewModel.allVacations()[i];
 
 
                 var marker = new google.maps.Marker({
                     map: gm,
-                    position: new google.maps.LatLng(res.lat+i*1,res.long+i*1),
+                    position: new google.maps.LatLng(res.lat,res.long),
                     title: res.name
                 });
 
                 marker.addListener('click', function () {
                     openInfoWindow(gm, marker);
                 });
+                
 
 
                 res.mapMarker = marker;
                 res.showMarker = true;
             }
-
-            //var position = new google.maps.LatLng(allBindingsAccessor().latitude(), allBindingsAccessor().longitude());
-
-
-            //viewModel._mapMarker = marker;
         },
 
         update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
 
 
-            var allRes = viewModel.allRestaurants();
-            var visRes = viewModel.restaurants();
+            var allRes = viewModel.allVacations();
+            //var visRes = viewModel.restaurants();
 
             //viewModel.allRestaurants()[0].mapMarker.setVisble(false);
           
@@ -114,64 +107,53 @@
 
 
     function openInfoWindow (map, marker) {
-    var contentString = '<div">' + marker.getTitle() + '</div>';
-    if (this.infowindow) {
-        this.infowindow.close();
-    };
+        var contentString = '<div">' + marker.getTitle() + '</div>';
+        var infowindow = new google.maps.InfoWindow({
+            content: contentString,
+            pixelOffset: new google.maps.Size(50, 0),
+        });
 
-    this.infowindow = new google.maps.InfoWindow({
-        content: contentString,
-        pixelOffset: new google.maps.Size(50, 0),
-    });
+        map.setZoom(9);
+        map.setCenter(marker.getPosition());
+        
+        google.maps.event.addListener(infowindow, 'closeclick', function () {
+            map.setZoom(3);
+            map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
+        });
 
-    map.setZoom(9);
-    map.setCenter(marker.getPosition());
-    this.infowindow.open(map, marker);
+        infowindow.open(map, marker);
 
-    //google.maps.event.addListener(this.infowindow, 'closeclick', function () {
-    //    map.setZoom(7);
-    //    //map.setCenter(mapOptions.center);
-    //}
-}
+    }
 
     function createMap() {
 
         var elevator;
         var myOptions = {
-            zoom: 15,
-            center: new google.maps.LatLng(51.4572253, 6.4787701),
+            zoom: 3,
+            center: new google.maps.LatLng(29.3491722,-34.5674402),
         };
         map = new google.maps.Map($('#map-div')[0], myOptions);
     }
 
     // some masterdata
-    var kitchenTypes = [
-        { type: "Italian Restaurant" },
-        { type: "Thai Streetkitchen" },
-        { type: "Burger Joint" },
-        { type: "Greek Grill" },
-        { type: "Chinese Restaurant" },
-        { type: "German Restaurant" },
-        { type: "Bar/Restaurant" }
+    var locationTypes = [
+        { type: "Hotel " },
+        { type: "Appartment" },
+        { type: "House" },
+        { type: "Camping" }
     ];
 
     // Searchable data
-    var restaurants = [
-        new Restaurant("The Stallion", kitchenTypes[0]),
-        new Restaurant("Thai Ngam", kitchenTypes[1]),
-        new Restaurant("Walt's Diner", kitchenTypes[2]),
-        new Restaurant("Apollon Grill", kitchenTypes[3]),
-        new Restaurant("China Restaurant Wang Fu", kitchenTypes[4]),
-        new Restaurant("Restaurant il Mulino Ercole Ruggiero", kitchenTypes[0]),
-        new Restaurant("Moerser Brauhaus", kitchenTypes[5]),
-        new Restaurant("Gasthof Hufen", kitchenTypes[5]),
-        new Restaurant("Cafe Del Sol", kitchenTypes[6]),
-        new Restaurant("Chili's Bar & Restaurant", kitchenTypes[4]),
-        new Restaurant("Bua Luang", kitchenTypes[1])
+    var vacations = [
+        new Vacation("San Pietro Rural", locationTypes[2], 44.3644916,9.2140754),
+        new Vacation("Habor View", locationTypes[1], 39.3626075, 2.9524576,77),
+        new Vacation("Lopesan Baobab Resort", locationTypes[1], 27.7409588, -15.6011867, 667),
+        new Vacation("Loews Royal Pacific Resort", locationTypes[0], 28.4678992, -81.4664681, 44),
+        new Vacation("Hyatt Regency Bellevue", locationTypes[0], 47.6178534, -122.2013131)
     ];
 
 // bind a new instance of our view model to the page
-var viewModel = new ViewModel(restaurants || []);
+    var viewModel = new ViewModel(vacations || []);
 
 $(document).ready(function () {
 

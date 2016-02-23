@@ -22,30 +22,30 @@
 </head>
 <body>
     <div class="page-header">
-        <h1>Udacity P5<small> aka My Dash </small></h1>
+        <h1>Udacity P5<small> aka My Vacations </small></h1>
     </div>
 
     <div class="well">
         <div class="row">
             <div class="form-group">
-                <label class="col-md-3 control-label" for="formGroupInputLarge">Me hungry!</label>
+                <label class="col-md-3 control-label" for="formGroupInputLarge">Check location</label>
 
                 <div class="col-md-7">
-                    <input class="form-control" type="text" id="formGroupInputLarge" placeholder="...type your food favorite to search..." data-bind="value: currentSearchFilter , valueUpdate: 'keyup'">
+                    <input class="form-control" type="text" id="formGroupInputLarge" placeholder="...type your stay to search..." data-bind="value: currentSearchFilter , valueUpdate: 'keyup'">
                 </div>
                 <div class="col-md-2">
 
-                    <button type="button" class="btn btn-primary glyphicon glyphicon-cutlery" data-bind="click:clearSearch"> Reset</button>
+                    <button type="button" class="btn btn-primary glyphicon glyphicon-plane" data-bind="click:clearSearch"> Reset</button>
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-2">
-            <div class="list-group" data-bind="foreach: restaurants">
+            <div class="list-group" data-bind="foreach: vacations">
                 <a href="#" class="list-group-item">
                     <h4 class="list-group-item-heading" data-bind="text: name "></h4>
-                    <p class="list-group-item-text" data-bind="text: typeOfKitchen().type"></p>
+                    <p class="list-group-item-text" data-bind="text: typeOfLocation().type"></p>
                     <div data-bind="text: showMarker"> </div>
                    
                 </a>
@@ -56,7 +56,7 @@
                 <div id="map-div">
                 
                 </div>
-                <div data-bind="map:map, restaurants"></div>
+                <div data-bind="map:map, vacations"></div>
             </div>
         </div>
     </div>

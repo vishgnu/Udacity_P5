@@ -115,7 +115,6 @@
     <Content Include="Scripts\knockout-3.4.0.debug.js" />
     <Content Include="Scripts\knockout-3.4.0.js" />
     <Content Include="Scripts\main.js" />
-    <Content Include="Scripts\map.js" />
     <Content Include="Service References\Application Insights\ConnectedService.json" />
     <Content Include="package.json" />
     <None Include="Properties\PublishProfiles\MyDash.pubxml" />
