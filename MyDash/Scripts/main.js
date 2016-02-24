@@ -66,6 +66,25 @@
             self.currentSearchFilter('');
             return;
         };
+
+        // handel click on list
+        self.clickLocationListItem = function (vacation) {
+            new google.maps.event.trigger(vacation.mapMarker, 'click');
+        }
+
+        // handle hover on list
+        self.hoverLocationListItemOn = function (vacation) {
+           
+            console.log("Hon:" + vacation.name);
+        }
+
+        self.hoverLocationListItemOff = function (vacation) {
+
+            console.log("hoff:" + vacation.name);
+        }
+
+
+
     }
 
     ko.bindingHandlers.map = {
