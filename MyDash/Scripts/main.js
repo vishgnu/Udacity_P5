@@ -35,6 +35,7 @@
         // keep track of self
         var self = this;
 
+        self.lastClick  = 
         // our data
         this.allVacations = ko.observableArray(vacations);
        
@@ -69,22 +70,22 @@
 
         // handel click on list
         self.clickLocationListItem = function (vacation) {
-            new google.maps.event.trigger(vacation.mapMarker, 'click');
+
+            if (this.lastClick != vacation.name) {
+
+                this.lastClick = vacation.name;
+
+                new google.maps.event.trigger(vacation.mapMarker, 'click');
+            }
+            else {
+                this.lastClick = "";
+                infowindow.close();
+                map.setZoom(3);
+                map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
+                vacation.mapMarker.setIcon();
+            }
+
         }
-
-        // handle hover on list
-        self.hoverLocationListItemOn = function (vacation) {
-           
-            console.log("Hon:" + vacation.name);
-        }
-
-        self.hoverLocationListItemOff = function (vacation) {
-
-            console.log("hoff:" + vacation.name);
-        }
-
-
-
     }
 
     ko.bindingHandlers.map = {
@@ -118,10 +119,12 @@
                         // show global marker 
                         infowindow.setContent(loadingContent);
                         infowindow.open(map, marker);
+                        marker.setIcon('https://www.google.com/mapfiles/marker_green.png');
                         
                         google.maps.event.addListener(infowindow, 'closeclick', function () {
                             map.setZoom(3);
                             map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
+                            marker.setIcon();
                         });
 
                         var url = "https://api.worldweatheronline.com/free/v2/weather.ashx?key=00b67585b3cb25e33e8723c524bc4&q=" + marker.title+ "&format=json&num_of_days=1&fx=no&cc=yes&mca=no&fx24=no"
