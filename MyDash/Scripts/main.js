@@ -81,12 +81,19 @@ var ViewModel = function(vacations) {
 
             var marker = new google.maps.Marker({
                 map: map,
+                animation: google.maps.Animation.DROP,
                 position: new google.maps.LatLng(filteredVacations[i].lat, filteredVacations[i].long),
                 title: filteredVacations[i].name
             });
             google.maps.event.addListener(marker, 'click', (function (marker, map, i) {
 
                 return function () {
+
+                    if (marker.getAnimation() !== null) {
+                        marker.setAnimation(null);
+                    } else {
+                        marker.setAnimation(google.maps.Animation.BOUNCE);
+                    }
 
                     map.setZoom(viewModel.vacations()[i].zoom);
                     map.setCenter(marker.getPosition());
@@ -100,6 +107,7 @@ var ViewModel = function(vacations) {
                         map.setZoom(3);
                         map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
                         marker.setIcon();
+                        marker.setAnimation(google.maps.Animation.DROP);
                     });
 
                     var url = "https://api.worldweatheronline.com/free/v2/weather.ashx?key=00b67585b3cb25e33e8723c524bc4&q=" + marker.title + "&format=json&num_of_days=1&fx=no&cc=yes&mca=no&fx24=no"
