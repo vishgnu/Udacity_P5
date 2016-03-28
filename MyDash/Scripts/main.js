@@ -21,11 +21,11 @@
         var self = this;
         self.name = name;
         self.typeOfLocation = ko.observable(locationType)
-        self.showMarker = false;
         self.lat = lat;
         self.long = long;
         self.zoom = zoomLev;
         self.mapMarker = null;
+        self.mapMarkerVisble = true;
         self.weatherLocation = weatherloc;
     }
 
@@ -35,7 +35,6 @@
         // keep track of self
         var self = this;
 
-        self.lastClick  = 
         // our data
         this.allVacations = ko.observableArray(vacations);
        
@@ -44,10 +43,11 @@
 
         self.vacations = ko.computed(function () {
             if (!self.currentSearchFilter()) {
+                
                 return self.allVacations();
             } else {
-
-                return ko.utils.arrayFilter(self.allVacations(), function (rest) {
+                var filteredVacations =
+                ko.utils.arrayFilter(self.allVacations(), function (rest) {
                     // get contains for type and restaurantname
                     var indexName = stringContains(rest.name.toLowerCase(), self.currentSearchFilter().toLowerCase());
                     var indexType = stringContains(rest.typeOfLocation().type.toLowerCase(), self.currentSearchFilter().toLowerCase());
@@ -58,9 +58,94 @@
                         return false;
                     };
                 });
+
+                self.resetMarkers();
+
+                // update mapmarkers here
+                for (var i = 0; i < filteredVacations.length; i++) {
+                    console.log(filteredVacations[i].name + "ceate marker !");
+
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: new google.maps.LatLng(filteredVacations[i].lat, filteredVacations[i].long),
+                        title: filteredVacations[i].name
+                    });
+                    google.maps.event.addListener(marker, 'click', (function (marker,map, i) {
+
+                            return function () {
+
+                                map.setZoom(viewModel.vacations()[i].zoom);
+                                map.setCenter(marker.getPosition());
+
+                                // show global marker 
+                                infowindow.setContent(loadingContent);
+                                infowindow.open(map, marker);
+                                marker.setIcon('https://www.google.com/mapfiles/marker_green.png');
+                        
+                                google.maps.event.addListener(infowindow, 'closeclick', function () {
+                                    map.setZoom(3);
+                                    map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
+                                    marker.setIcon();
+                                });
+
+                                var url = "https://api.worldweatheronline.com/free/v2/weather.ashx?key=00b67585b3cb25e33e8723c524bc4&q=" + marker.title+ "&format=json&num_of_days=1&fx=no&cc=yes&mca=no&fx24=no"
+
+                                $.ajax({
+
+                                    url: url,
+                                    type: 'POST',
+                                    data: { location: i, name: marker.title },
+                                    contentType: 'application/json; charset=utf-8',
+                                    success: function (response) {
+
+                                        var content =
+                                            "<div class='map-info-window'>"+
+                                                "<div class='row'>"+
+                                                    "<div class='col-md-6'>Temperature</div>" +
+                                                    "<div class='col-md-6'>"+ response.data.current_condition[0].FeelsLikeC +" C </div>" +
+                                                " </div>" +
+                                                "<div class='row'>" +
+                                                    "<div class='col-md-6'>Humidity</div>" +
+                                                    "<div class='col-md-6'>"+ response.data.current_condition[0].humidity + " % </div>" +
+                                                " </div>" +
+                                                "<div class='row'>" +
+                                                    "<div class='col-md-6'>Current Weather </div>" +
+                                                    "<div class='col-md-6'>"+ response.data.current_condition[0].weatherDesc[0].value + "</div>" +
+                                                " </div>" +
+                                                "<div class='row'>" +
+                                                    "<div class='col-md-2 col-md-offset-5'><img alt='weather icon' src ='" + response.data.current_condition[0].weatherIconUrl[0].value + "'> </img> </div>"
+                                        " </div>" +
+                                        "</div>";
+
+
+                                        infowindow.setContent(content);
+                                    },
+                                    error: function () {
+                                        infowindow.setContent("<h3>No weather avaliable - sorry</h3>")
+                                    }
+                                });
+                            }
+                        })(marker,map, i));
+
+                    filteredVacations[i].mapMarker = marker;
+                    filteredVacations[i].showMarker = true;
+                }
+
+                return filteredVacations;
             }
             ko.applyBindings(viewModel);
         });
+
+        // reset marker function
+        self.resetMarkers = function () {
+
+            for (var i = 0; i < vacations.length; i++) {
+                if (vacations[i].mapMarker != null) {
+                    vacations[i].mapMarker.setMap(null);
+                }
+            }
+
+        }
 
         // clear existing filter and show all data again
         self.clearSearch = function () {
@@ -88,119 +173,101 @@
         }
     }
 
-    ko.bindingHandlers.map = {
+    //ko.bindingHandlers.map = {
 
-        init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+    //    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
 
-            var gm = allBindingsAccessor().map;
+    //        var gm = allBindingsAccessor().map;
 
 
-            for (var i = 0; i < viewModel.vacations().length; i++) {
+    //        for (var i = 0; i < viewModel.vacations().length; i++) {
                 
-                var res = viewModel.vacations()[i];
+    //            var res = viewModel.vacations()[i];
 
+    //            var marker = new google.maps.Marker({
+    //                map: null,
+    //                position: new google.maps.LatLng(res.lat,res.long),
+    //                title: res.name
+    //            });
 
-                var marker = new google.maps.Marker({
-                    map: gm,
-                    position: new google.maps.LatLng(res.lat,res.long),
-                    title: res.name
-                });
+    //            google.maps.event.addListener(marker, 'click', (function (marker,map, i) {
+    //                return function () {
 
-                //marker.addListener('click', function () {
-                //    openInfoWindow(gm, marker);
-                //});
-                
-                google.maps.event.addListener(marker, 'click', (function (marker,map, i) {
-                    return function () {
+    //                    map.setZoom(viewModel.vacations()[i].zoom);
+    //                    map.setCenter(marker.getPosition());
 
-                        map.setZoom(viewModel.vacations()[i].zoom);
-                        map.setCenter(marker.getPosition());
-
-                        // show global marker 
-                        infowindow.setContent(loadingContent);
-                        infowindow.open(map, marker);
-                        marker.setIcon('https://www.google.com/mapfiles/marker_green.png');
+    //                    // show global marker 
+    //                    infowindow.setContent(loadingContent);
+    //                    infowindow.open(map, marker);
+    //                    marker.setIcon('https://www.google.com/mapfiles/marker_green.png');
                         
-                        google.maps.event.addListener(infowindow, 'closeclick', function () {
-                            map.setZoom(3);
-                            map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
-                            marker.setIcon();
-                        });
+    //                    google.maps.event.addListener(infowindow, 'closeclick', function () {
+    //                        map.setZoom(3);
+    //                        map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
+    //                        marker.setIcon();
+    //                    });
 
-                        var url = "https://api.worldweatheronline.com/free/v2/weather.ashx?key=00b67585b3cb25e33e8723c524bc4&q=" + marker.title+ "&format=json&num_of_days=1&fx=no&cc=yes&mca=no&fx24=no"
+    //                    var url = "https://api.worldweatheronline.com/free/v2/weather.ashx?key=00b67585b3cb25e33e8723c524bc4&q=" + marker.title+ "&format=json&num_of_days=1&fx=no&cc=yes&mca=no&fx24=no"
 
-                        $.ajax({
+    //                    $.ajax({
 
-                            url: url,
-                            type: 'POST',
-                            data: { location: i, name: marker.title },
-                            contentType: 'application/json; charset=utf-8',
-                            success: function (response) {
+    //                        url: url,
+    //                        type: 'POST',
+    //                        data: { location: i, name: marker.title },
+    //                        contentType: 'application/json; charset=utf-8',
+    //                        success: function (response) {
 
-                                var content =
-                                    "<div class='map-info-window'>"+
-                                        "<div class='row'>"+
-                                          "<div class='col-md-6'>Temperature</div>" +
-                                          "<div class='col-md-6'>"+ response.data.current_condition[0].FeelsLikeC +" C </div>" +
-                                       " </div>" +
-                                        "<div class='row'>" +
-                                          "<div class='col-md-6'>Humidity</div>" +
-                                          "<div class='col-md-6'>"+ response.data.current_condition[0].humidity + " % </div>" +
-                                       " </div>" +
-                                        "<div class='row'>" +
-                                          "<div class='col-md-6'>Current Weather </div>" +
-                                          "<div class='col-md-6'>"+ response.data.current_condition[0].weatherDesc[0].value + "</div>" +
-                                       " </div>" +
-                                        "<div class='row'>" +
-                                          "<div class='col-md-2 col-md-offset-5'><img alt='weather icon' src ='" + response.data.current_condition[0].weatherIconUrl[0].value + "'> </img> </div>"
-                                " </div>" +
-                                "</div>";
-
-
-                                infowindow.setContent(content);
-                            },
-                            error: function () {
-                                infowindow.setContent("<h3>No weather avaliable - sorry</h3>")
-                            }
-                        });
-                    }
-                })(marker,map, i));
+    //                            var content =
+    //                                "<div class='map-info-window'>"+
+    //                                    "<div class='row'>"+
+    //                                      "<div class='col-md-6'>Temperature</div>" +
+    //                                      "<div class='col-md-6'>"+ response.data.current_condition[0].FeelsLikeC +" C </div>" +
+    //                                   " </div>" +
+    //                                    "<div class='row'>" +
+    //                                      "<div class='col-md-6'>Humidity</div>" +
+    //                                      "<div class='col-md-6'>"+ response.data.current_condition[0].humidity + " % </div>" +
+    //                                   " </div>" +
+    //                                    "<div class='row'>" +
+    //                                      "<div class='col-md-6'>Current Weather </div>" +
+    //                                      "<div class='col-md-6'>"+ response.data.current_condition[0].weatherDesc[0].value + "</div>" +
+    //                                   " </div>" +
+    //                                    "<div class='row'>" +
+    //                                      "<div class='col-md-2 col-md-offset-5'><img alt='weather icon' src ='" + response.data.current_condition[0].weatherIconUrl[0].value + "'> </img> </div>"
+    //                            " </div>" +
+    //                            "</div>";
 
 
+    //                            infowindow.setContent(content);
+    //                        },
+    //                        error: function () {
+    //                            infowindow.setContent("<h3>No weather avaliable - sorry</h3>")
+    //                        }
+    //                    });
+    //                }
+    //            })(marker,map, i));
 
-                res.mapMarker = marker;
-                res.showMarker = true;
-            }
-        },
+    //            res.mapMarker = marker;
+    //            res.showMarker = true;
+    //        }
+    //    },
 
-        update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+    //    update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
 
-            // get filered
-            var allRes = viewModel.vacations();
+    //        // get filered
+    //        var allRes = viewModel.allVacations()
             
+    //        for (var i = 0; i < allRes.length; i++) {
 
-        }
-    };
+    //            if (allRes[i].mapMarkerVisble) {
+    //                allRes[i].mapMarker.setMap(allBindingsAccessor().map);
+    //            }
+    //            else {
+    //                allRes[i].mapMarker.setMap(null);
+    //            }
 
-
-    //function openInfoWindow (map, marker) {
-    //    var contentString = '<div">' + marker.getTitle() + '</div>';
-    //    var infowindow = new google.maps.InfoWindow({
-    //        content: contentString,
-    //        pixelOffset: new google.maps.Size(50, 0),
-    //    });
-
-    //    map.setZoom(9);
-    //    map.setCenter(marker.getPosition());
-        
-    //    google.maps.event.addListener(infowindow, 'closeclick', function () {
-    //        map.setZoom(3);
-    //        map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
-    //    });
-
-    //    infowindow.open(map, marker);
-
-    //}
+    //        }
+    //    }
+    //};
 
     function createMap() {
 
