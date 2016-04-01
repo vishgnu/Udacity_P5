@@ -7,4 +7,4 @@ Show , search and check the weather for my favorite destinations around the glob
 How To Run
 ===
 
-DO STUFF
+Run index.html in browser
