@@ -52,7 +52,7 @@
         <div class="col-lg-10">
             <div style="height:100%; margin: 0; padding: 0;">
                 <div id="map-div">
-                
+
                 </div>
                 <div data-bind="map:map, vacations"></div>
             </div>
@@ -61,27 +61,21 @@
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="Scripts/bootstrap.min.js"></script>
     <!-- Knockout-->
     <script src="Scripts/knockout-3.4.0.js"></script>
 
-    <!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1PGxZvLmfSm8lZvmcetnAWTy_AByM5Lk&callback=initializeMap"></script>-->
+
+    <!-- Google maps-->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqSRS4xSeFPLEeNoSThlN0pqXpswxK740"></script>
+
     <!-- get the app-->
+    <script src="Scripts/helpers.js"></script>
+    <script src="Scripts/datamodels.js"></script>
     <script src="Scripts/main.js"></script>
 
 </body>
 
 </html>
-
-<!--<script type="text/javascript">
-    var appInsights = window.appInsights || function (config) {
-        function r(config) { t[config] = function () { var i = arguments; t.queue.push(function () { t[config].apply(t, i) }) } } var t = { config: config }, u = document, e = window, o = "script", s = u.createElement(o), i, f; for (s.src = config.url || "//az416426.vo.msecnd.net/scripts/a/ai.0.js", u.getElementsByTagName(o)[0].parentNode.appendChild(s), t.cookie = u.cookie, t.queue = [], i = ["Event", "Exception", "Metric", "PageView", "Trace"]; i.length;) r("track" + i.pop()); return r("setAuthenticatedUserContext"), r("clearAuthenticatedUserContext"), config.disableExceptionTracking || (i = "onerror", r("_" + i), f = e[i], e[i] = function (config, r, u, e, o) { var s = f && f(config, r, u, e, o); return s !== !0 && t["_" + i](config, r, u, e, o), s }), t
-    }({
-        instrumentationKey: "8a172315-cd11-4fe7-ad61-9842a75976ec"
-    });
-
-    window.appInsights = appInsights;
-    appInsights.trackPageView();
-</script>-->

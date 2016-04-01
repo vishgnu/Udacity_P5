@@ -1,33 +1,10 @@
 ﻿'use strict';
 
-//global for map
+//create global for map
 var map;
 
 // current instance of infowindow
 var infowindow;
-var loadingContent = "<h3> loading...</h3>"
-
-// helper
-var stringContains = function (string, contains) {
-    string = string || "";
-    contains = contains || "";
-    if (contains.length > string.length)
-        return -1;
-    return string.indexOf(contains);
-};
-
-// Class to represent a single restaurant
-var Vacation = function (name, locationType, lat, long, weatherloc, zoomLev) {
-    var self = this;
-    self.name = name;
-    self.typeOfLocation = ko.observable(locationType)
-    self.lat = lat;
-    self.long = long;
-    self.zoom = zoomLev;
-    self.mapMarker = null;
-    self.mapMarkerVisble = true;
-    self.weatherLocation = weatherloc;
-}
 
 // main viewmodel for this screen, along with initial state
 var ViewModel = function(vacations) {
@@ -35,10 +12,10 @@ var ViewModel = function(vacations) {
     // keep track of self
     var self = this;
 
-    // our data
+    // our complete "database"
     this.allVacations = ko.observableArray(vacations);
 
-    // reset marker function
+    // reset all markers
     self.resetMarkers = function () {
 
         for (var i = 0; i < vacations.length; i++) {
@@ -54,7 +31,7 @@ var ViewModel = function(vacations) {
     // vacation list with filter and markers
     self.vacations = ko.computed(function () {
         var filteredVacations;
-        // filter if is set
+        // filter if is set so do filtering of locations
         if (self.currentSearchFilter()) {
 
             filteredVacations = ko.utils.arrayFilter(self.allVacations(), function (rest) {
@@ -70,100 +47,100 @@ var ViewModel = function(vacations) {
             });
         }
         else {
+            // no filter is set set all vacations as filtered
             filteredVacations = self.allVacations();
         }
 
+        // reset all markers
         self.resetMarkers();
 
-        // update mapmarkers here
+        // update mapmarkers here for all found search results
         for (var i = 0; i < filteredVacations.length; i++) {
             console.log(filteredVacations[i].name + " - create marker !");
 
+            // create marker for all 
             var marker = new google.maps.Marker({
                 map: map,
                 animation: google.maps.Animation.DROP,
                 position: new google.maps.LatLng(filteredVacations[i].lat, filteredVacations[i].long),
                 title: filteredVacations[i].name
             });
-            google.maps.event.addListener(marker, 'click', (function (marker, map, i) {
 
+            // add click function to googlemaps for each marker including data retrieval
+            google.maps.event.addListener(marker, 'click', (function (marker, map, i) {
                 return function () {
 
+                    // run animation for click
                     if (marker.getAnimation() !== null) {
                         marker.setAnimation(null);
                     } else {
                         marker.setAnimation(google.maps.Animation.BOUNCE);
                     }
 
+                    // zoommin on map
                     map.setZoom(viewModel.vacations()[i].zoom);
                     map.setCenter(marker.getPosition());
 
-                    // show global marker 
+                    // show marker green for selected
                     infowindow.setContent(loadingContent);
                     infowindow.open(map, marker);
                     marker.setIcon('https://www.google.com/mapfiles/marker_green.png');
 
+                    // add eventhandler for closing
                     google.maps.event.addListener(infowindow, 'closeclick', function () {
                         map.setZoom(3);
-                        map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
+                        map.setCenter(new google.maps.LatLng(startCoordinates.lat, startCoordinates.long));
                         marker.setIcon();
+                        marker.setAnimation(google.maps.Animation.DROP);
                     });
 
-                    var url = "https://api.worldweatheronline.com/free/v2/weather.ashx?key=00b67585b3cb25e33e8723c524bc4&q=" + marker.title + "&format=json&num_of_days=1&fx=no&cc=yes&mca=no&fx24=no"
-
+                    // get some data from worldweather for the clicked location via datamodel url and the makertitle
                     $.ajax({
-
-                        url: url,
+                    url: weatherApiURL.replace("!%%MarkerTitle%%!",marker.title),
                         type: 'POST',
                         data: { location: i, name: marker.title },
                         contentType: 'application/json; charset=utf-8',
                         success: function (response) {
 
-                            var content =
-                                "<div class='map-info-window'>" +
-                                    "<div class='row'>" +
-                                        "<div class='col-md-6'>Temperature</div>" +
-                                        "<div class='col-md-6'>" + response.data.current_condition[0].FeelsLikeC + " C </div>" +
-                                    " </div>" +
-                                    "<div class='row'>" +
-                                        "<div class='col-md-6'>Humidity</div>" +
-                                        "<div class='col-md-6'>" + response.data.current_condition[0].humidity + " % </div>" +
-                                    " </div>" +
-                                    "<div class='row'>" +
-                                        "<div class='col-md-6'>Current Weather </div>" +
-                                        "<div class='col-md-6'>" + response.data.current_condition[0].weatherDesc[0].value + "</div>" +
-                                    " </div>" +
-                                    "<div class='row'>" +
-                                        "<div class='col-md-2 col-md-offset-5'><img alt='weather icon' src ='" + response.data.current_condition[0].weatherIconUrl[0].value + "'> </img> </div>"
-                            " </div>" +
-                            "</div>";
+                            // if the weather return we will prepare the result html with the weather info
+                            var content = weatherInfoWindowContent;
+                            content = content.replace("!%%FeelsLikeC%%!", response.data.current_condition[0].FeelsLikeC)
+                                      .replace("!%%humidity%%!", response.data.current_condition[0].humidity)
+                                      .replace("!%%weatherDesc%%!", response.data.current_condition[0].weatherDesc[0].value)
+                                      .replace("!%%weatherIconUrl%%!", response.data.current_condition[0].weatherIconUrl[0].value);
 
-
+                            // set content to marker info
                             infowindow.setContent(content);
                         },
                         error: function () {
-                            infowindow.setContent("<h3>No weather avaliable - sorry</h3>")
+                            // incase sth goes wrong we will show a message to the user
+                            // !!!!
+                            // please be aware that this demo uses a free version of the api and will only allow a certain number of requests per day
+                            // !!!!
+                            infowindow.setContent(noWeather);
                         }
                     });
                 }
             })(marker, map, i));
 
+            // store markers on dataobjects so we can access them for other operations
             filteredVacations[i].mapMarker = marker;
             filteredVacations[i].showMarker = true;
         }
 
+        //return search result for binding to list
         return filteredVacations;
-
-       
     });
     
-    // clear existing filter and show all data again
+    // clear existing filter and show all data again by resetting the search filter
     self.clearSearch = function () {
         self.currentSearchFilter('');
         return;
     };
 
-    // handel click on list
+    // handle click on list of locations
+    // this will trigger the click event of the marker to show details
+    // and if another marker is clicked reset the selected details
     self.clickLocationListItem = function (vacation) {
 
         if (this.lastClick != vacation.name) {
@@ -176,19 +153,22 @@ var ViewModel = function(vacations) {
             this.lastClick = "";
             infowindow.close();
             map.setZoom(3);
-            map.setCenter(new google.maps.LatLng(29.3491722, -34.5674402));
+            map.setCenter(new google.maps.LatLng(startCoordinates.lat, startCoordinates.long));
             vacation.mapMarker.setIcon();
+            marker.setAnimation(google.maps.Animation.DROP);
         }
     };
 }
 
+
+// function to create the google map object once
 function createMap() {
 
     var elevator;
     var myOptions = {
         zoom: 3,
         mapTypeId: google.maps.MapTypeId.SATELLITE,
-        center: new google.maps.LatLng(29.3491722,-34.5674402),
+        center: new google.maps.LatLng(startCoordinates.lat, startCoordinates.long),
     };
     map = new google.maps.Map($('#map-div')[0], myOptions);
 
@@ -197,29 +177,12 @@ function createMap() {
         content: loadingContent,
         pixelOffset: new google.maps.Size(10, 0),
     });
-
 }
-
-// some masterdata
-var locationTypes = [
-    { type: "Hotel " },
-    { type: "Appartment" },
-    { type: "House" },
-    { type: "Camping" }
-];
-
-// Searchable data
-var vacations = [
-    new Vacation("San Pietro Olive", locationTypes[2], 44.3644916,9.2140754, "Rapallo", 19),
-    new Vacation("Habor View ", locationTypes[1], 39.3626075, 2.9524576,"SA Rapita", 15),
-    new Vacation("Lopesan Baobab Resort", locationTypes[1], 27.7409588, -15.6011867,"MASPALOMAS",20),
-    new Vacation("Loews Royal Pacific Resort", locationTypes[0], 28.4678992, -81.4664681, "ORLANDO",15),
-    new Vacation("Hyatt Regency Bellevue", locationTypes[0], 47.6178534, -122.2013131, "SEATTLE",19)
-];
 
 // bind a new instance of our view model to the page
 var viewModel = new ViewModel(vacations || []);
 
+// when document is ready start our app
 $(document).ready(function () {
 
     createMap();
