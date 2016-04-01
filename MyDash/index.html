@@ -43,7 +43,7 @@
     <div class="row">
         <div class="col-md-2">
             <div class="list-group" data-bind="foreach: vacations">
-                <a href="#" class="list-group-item" data-bind="click:  $parent.clickLocationListItem">
+                <a href="#" class="list-group-item" data-bind="click:  $parent.clickLocationListItem" title="click me for details">
                     <h4 class="list-group-item-heading" data-bind="text: name "></h4>
                     <p class="list-group-item-text" data-bind="text: typeOfLocation().type"></p>
                 </a>
