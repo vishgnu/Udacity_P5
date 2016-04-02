@@ -224,9 +224,9 @@ function createMap() {
 
     var elevator;
     var myOptions = {
-        zoom: 3,
+        //zoom: 3,
         mapTypeId: google.maps.MapTypeId.SATELLITE,
-        center: new google.maps.LatLng(startCoordinates.lat, startCoordinates.long),
+        //center: new google.maps.LatLng(startCoordinates.lat, startCoordinates.long),
     };
     map = new google.maps.Map($('#map-div')[0], myOptions);
 
