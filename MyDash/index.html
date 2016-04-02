@@ -24,41 +24,48 @@
     <div class="page-header">
         <h1>Udacity P6-1<small> aka My Vacations </small></h1>
     </div>
+    <div id="fatalError" class="invisible">
+        <h2>
+            Beware the dragons - please come back later after we solved the problem.
+        </h2>
+    </div>
+    <div id="app">
+        <div class="well">
+            <div class="row">
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="formGroupInputLarge">Check location</label>
 
-    <div class="well">
+                    <div class="col-md-7">
+                        <input class="form-control" type="text" id="formGroupInputLarge" placeholder="...type your stay to search..." data-bind="value: currentSearchFilter , valueUpdate: 'keyup'">
+                    </div>
+                    <div class="col-md-2">
+
+                        <button type="button" class="btn btn-primary glyphicon glyphicon-plane" data-bind="click:clearSearch"> Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
-            <div class="form-group">
-                <label class="col-md-3 control-label" for="formGroupInputLarge">Check location</label>
-
-                <div class="col-md-7">
-                    <input class="form-control" type="text" id="formGroupInputLarge" placeholder="...type your stay to search..." data-bind="value: currentSearchFilter , valueUpdate: 'keyup'">
+            <div class="col-md-2">
+                <div class="list-group" data-bind="foreach: vacations">
+                    <a href="#" class="list-group-item" data-bind="click:  $parent.clickLocationListItem" title="click me for details">
+                        <h4 class="list-group-item-heading" data-bind="text: name "></h4>
+                        <p class="list-group-item-text" data-bind="text: typeOfLocation().type"></p>
+                    </a>
                 </div>
-                <div class="col-md-2">
+            </div>
+            <div class="col-lg-10">
+                <div style="height:100%; margin: 0; padding: 0;">
+                    <div id="map-div">
 
-                    <button type="button" class="btn btn-primary glyphicon glyphicon-plane" data-bind="click:clearSearch"> Reset</button>
+                    </div>
+                    <div data-bind="map:map, vacations"></div>
                 </div>
             </div>
         </div>
+
     </div>
-    <div class="row">
-        <div class="col-md-2">
-            <div class="list-group" data-bind="foreach: vacations">
-                <a href="#" class="list-group-item" data-bind="click:  $parent.clickLocationListItem" title="click me for details">
-                    <h4 class="list-group-item-heading" data-bind="text: name "></h4>
-                    <p class="list-group-item-text" data-bind="text: typeOfLocation().type"></p>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-10">
-            <div style="height:100%; margin: 0; padding: 0;">
-                <div id="map-div">
-
-                </div>
-                <div data-bind="map:map, vacations"></div>
-            </div>
-        </div>
-    </div>
-
+    
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
@@ -67,13 +74,14 @@
     <!-- Knockout-->
     <script src="Scripts/knockout-3.4.0.js"></script>
 
-
-    <!-- Google maps-->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqSRS4xSeFPLEeNoSThlN0pqXpswxK740"></script>
-
     <!-- get the app-->
     <script src="Scripts/helpers.js"></script>
     <script src="Scripts/datamodels.js"></script>
+
+    <!-- Google maps-->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqSRS4xSeFPLEeNoSThlN0pqXpswxK740&callback=createMap" onerror="googleMapsError()"></script>
+
+    <!-- load the app-->
     <script src="Scripts/main.js"></script>
 
 </body>

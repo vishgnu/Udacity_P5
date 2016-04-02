@@ -44,7 +44,6 @@ var Vacation = function (name, locationType, lat, long, weatherloc, zoomLev) {
     self.long = long;
     self.zoom = zoomLev;
     self.mapMarker = null;
-    self.mapMarkerVisble = true;
     self.weatherLocation = weatherloc;
 }
 

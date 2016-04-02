@@ -9,3 +9,9 @@ var stringContains = function (string, contains) {
         return -1;
     return string.indexOf(contains);
 };
+
+// show error and hide app incase anything with map goes wrong
+function googleMapsError() {
+    $('#app').css('visibility', 'hidden');
+    $('#fatalError').css('visibility', 'visible');
+}
